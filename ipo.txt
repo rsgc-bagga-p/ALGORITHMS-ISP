@@ -1,0 +1,15 @@
+Input, Process and Output Explanation
+Puneet Singh Bagga 
+Date: January 12th, 2016
+
+INPUT:
+
+The program takes an input from the Arduino accelerometer. Inside the program for the obstructions, it also takes a value in from randomizer for the amount of obstructions to the placement of the objects.
+
+PROCESS:
+
+The accelerometer value is given in both negative and positive, it ranges from -1.00 to +1.00, I had to map the values in processing to 0.00 to 2.00, and then multiply the values by 250 so it moves across the whole screen. The obstructions first take in a random value between 1 and 10 to determine how many blocks will be on the canvas, then there is an array holding random values for the x and the y values for the objects. 
+
+OUTPUT:
+
+The program outputs a game, using the randomizer it put obstructions in front of the player who moves their object using the accelerometer.
