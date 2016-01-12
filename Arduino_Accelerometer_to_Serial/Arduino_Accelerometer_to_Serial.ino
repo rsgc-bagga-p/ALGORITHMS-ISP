@@ -30,6 +30,9 @@ void averageRead(){ //reads the accelerometer values and sends out an average
   
  } 
   val = val / 7; //averages the value
-  Serial.println(val); //prints them to serial
+ // float newVal = map(val, -1.00, 1.00, 0.00, 2.00); // maps the average to positive values
+  //newVal = newVal * 250.00; // multiplies the value to canvas size
+  Serial.print(val);
+  Serial.print("|");
 }
 

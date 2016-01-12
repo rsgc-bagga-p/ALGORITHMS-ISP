@@ -26,15 +26,16 @@ class Sketch : NSObject, ORSSerialPortDelegate {
     // Declare any properties you need for your sketch below this comment, but before init()
     var serialPort : ORSSerialPort?       // Object required to read serial port
     var serialBuffer : String = ""
-    var x = 0   // Horizontal position for the circle appearing on screen
+    var x = 0.00   // x input from accelerometer
     var y = 0   // Vertical position for the circle appearing on screen
     var s = 1
+    var newX = 0 //new x variable, controls the horizontal 
 
     // This runs once, equivalent to setup() in Processing
     override init() {
         
         // Create canvas object – specify size
-        canvas = Canvas(width: 500, height: 300)
+        canvas = Canvas(width: 500, height: 700)
         
         // The frame rate can be adjusted; the default is 60 fps
         canvas.framesPerSecond = 60
@@ -72,12 +73,12 @@ class Sketch : NSObject, ORSSerialPortDelegate {
     func draw() {
                 
         // Horizontal position of circle
-        x = x + s
+        y = y + s
         
-        // Bounce when hitting wall
-        if (x > canvas.width || x < 0) {
-            s *= -1
-        }
+        // reset the circle
+        if (y > canvas.height) {
+            y = 0
+         }
         
         // "Clear" the background with a semi-transparent black rectangle
         canvas.drawShapesWithBorders = false
@@ -87,8 +88,7 @@ class Sketch : NSObject, ORSSerialPortDelegate {
         // Draw a circle that moves across the screen
         canvas.drawShapesWithBorders = false
         canvas.fillColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
-        canvas.drawEllipse(centreX: x, centreY: y, width: 25, height: 25)
-                
+        canvas.drawEllipse(centreX: newX, centreY: y, width: 25, height: 25)
     }
     
     // ORSSerialPortDelegate
@@ -98,7 +98,9 @@ class Sketch : NSObject, ORSSerialPortDelegate {
         
         // Print whatever we receive off the serial port to the console
         if let string = String(data: data, encoding: NSUTF8StringEncoding) {
-
+            
+            //print("\(string)", terminator: "")
+            
             // Iterate over all the characters received from the serial port this time
             for chr in string.characters {
                 
@@ -106,9 +108,12 @@ class Sketch : NSObject, ORSSerialPortDelegate {
                 if chr == "|" {
                     
                     // Entire value sent from Arduino board received, assign to
-                    // variable that controls the vertical position of the circle on screen
-                    y = Int(serialBuffer)!
-                    
+                    // variable that controls the horizontal position of the circle on screen
+                    x = Double(serialBuffer)! //takes the value as a doublefloat
+                    x = x * -500 // multiplies it by -500 to change the sides of the accelerometer and
+                                // to keep it at scale
+                    newX = Int(x) //coverts to integer and assigns it to new variable
+                    print("\(string)", terminator: "")
                     // Reset the string that is the buffer for data received from serial port
                     serialBuffer = ""
                     
