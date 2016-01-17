@@ -10,7 +10,7 @@ import Foundation
 
 // NOTE: The Sketch class will define the methods required by the ORSSerialPortDelegate protocol
 //
-// “A protocol defines a blueprint of methods, properties, and other requirements that suit a 
+// “A protocol defines a blueprint of methods, properties, and other requirements that suit a
 // particular task or piece of functionality.”
 //
 // Excerpt From: Apple Inc. “The Swift Programming Language (Swift 2).” iBooks. https://itun.es/ca/jEUH0.l
@@ -18,7 +18,7 @@ import Foundation
 // In this case, the Sketch class implements methods that allow us to read and use the serial port, via
 // the ORSSerialPort library.
 class Sketch : NSObject, ORSSerialPortDelegate {
-
+    
     // NOTE: Every sketch must contain an object of type Canvas named 'canvas'
     //       Therefore, the line immediately below must always be present.
     let canvas : Canvas
@@ -29,8 +29,16 @@ class Sketch : NSObject, ORSSerialPortDelegate {
     var x = 0.00   // x input from accelerometer
     var y = 0   // Vertical position for the circle appearing on screen
     var s = 1
-    var newX = 0 //new x variable, controls the horizontal 
-
+    var newX = 0 //new x variable, controls the horizontal
+    var blockX: [Int] = [0,0,0,0,0,0,0,0,0,0] //obstruction x value
+    var blockY: [Int] = [0,0,0,0,0,0,0,0,0,0] //obstruction y value
+    var blockNum = 0 //number of obstructions
+    var i = 1 //counter
+    var boolCheck = true //bool checker
+    var gameOver = false //game over
+    var score = 0 //score counter
+    var levelCounter = 0 //level counter
+    
     // This runs once, equivalent to setup() in Processing
     override init() {
         
@@ -39,7 +47,7 @@ class Sketch : NSObject, ORSSerialPortDelegate {
         
         // The frame rate can be adjusted; the default is 60 fps
         canvas.framesPerSecond = 60
-
+        
         // Call superclass initializer
         super.init()
         
@@ -67,28 +75,104 @@ class Sketch : NSObject, ORSSerialPortDelegate {
             
         }
         
+        //calls a random number for the number of obstructions
+        blockNum = Int(arc4random_uniform(9)) + 1 //values between 1-10
+        print(blockNum) //prints the value
+        
     }
     
     // Runs repeatedly, equivalent to draw() in Processing
     func draw() {
+        
+        if (gameOver == false){ // if the game is still continuing
+            
+            // vertical position of circle
+            y = y + s
+            
+            ++score //adds to the score value
+            // reset the circle and obstructions
+            if (y > canvas.height) {
+                ++levelCounter
+                y = 0 //starts at the bootom of the canvas
+                blockNum = Int(arc4random_uniform(9)) + 1 //calls a random number of obstructions
+                print(blockNum) //prints the value
+                boolCheck = true //re creates the obstructions
+                i = 0  //resets the counter
+                for j in 0...blockNum{ //assigns random values to the array
+                    blockX[j] = Int(arc4random_uniform(300)) //random number between 0 and 300
+                    blockY[j] = Int(arc4random_uniform(700)) //random number between 0 and 700
+                }
+            }
+            
+            // "Clear" the background with a black rectangle
+            canvas.drawShapesWithBorders = false
+            canvas.fillColor = Color(hue: 0, saturation: 0, brightness: 0, alpha: 100)
+            canvas.drawRectangle(bottomRightX: 0, bottomRightY: 0, width: canvas.width, height: canvas.height)
+            
+            // Writes the title of the project on the screen
+            //ALGORITHMS-ISP
+            canvas.textColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawText(message: "ALGORITHMS-ISP", size: 40, x: (canvas.width/2) - 175, y: (canvas.height/2) - 40)
+            
+            //level
+            canvas.textColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawText(message: "Level = " + String(levelCounter), size: 25, x: (canvas.width/2) - 225, y:650)
+            
+            //score
+            canvas.textColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawText(message: "Score = " + String(score), size: 25, x: (canvas.width/2) + 95, y: 650)
+            
+            // Draw a circle that moves across the screen
+            canvas.drawShapesWithBorders = false
+            canvas.fillColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawEllipse(centreX: newX, centreY: y, width: 35, height: 35)
+            
+            while(boolCheck) { //while this is true
+                //Drawing the obstructions
+                canvas.drawShapesWithBorders = false
+                canvas.fillColor = Color(hue: 0, saturation: 100, brightness: 100, alpha: 100)
+                canvas.drawRectangle(bottomRightX: blockX[i], bottomRightY: blockY[i], width: 60, height: 60)
                 
-        // Horizontal position of circle
-        y = y + s
-        
-        // reset the circle
-        if (y > canvas.height) {
-            y = 0
-         }
-        
-        // "Clear" the background with a semi-transparent black rectangle
-        canvas.drawShapesWithBorders = false
-        canvas.fillColor = Color(hue: 0, saturation: 0, brightness: 0, alpha: 10)
-        canvas.drawRectangle(bottomRightX: 0, bottomRightY: 0, width: canvas.width, height: canvas.height)
-        
-        // Draw a circle that moves across the screen
-        canvas.drawShapesWithBorders = false
-        canvas.fillColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
-        canvas.drawEllipse(centreX: newX, centreY: y, width: 25, height: 25)
+                ++i //adds to the counter
+                
+                if i >= blockNum{ //if the counter is greater than or equal to the random number
+                    boolCheck = false //ends loop
+                    i = 0 //resets counter
+                }
+                
+            }
+            boolCheck = true //recreates the obstructions
+            
+            for p in 1...blockNum{ //for int p in blocknum
+                if (y > blockY[p] && y < blockY[p] + 60 && newX > blockX[p] && newX < blockX[p] + 60){ //if the x and y value of the circle are equal to the block position then do this
+                    
+                    gameOver = true //game over
+                    
+                }
+            }
+        }
+        else {
+            
+            //game over
+            
+            // "Clear" the screen with a black rectangle
+            canvas.drawShapesWithBorders = false
+            canvas.fillColor = Color(hue: 0, saturation: 0, brightness: 0, alpha: 100)
+            canvas.drawRectangle(bottomRightX: 0, bottomRightY: 0, width: canvas.width, height: canvas.height)
+            //game over
+            canvas.textColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawText(message: "GAME OVER", size: 40, x: (canvas.width/2) - 120, y: (canvas.height/2) - 40)
+            //adding an emoji
+            canvas.drawText(message: "😈", size: 50, x: (canvas.width/2) - 30, y: (canvas.height/2) - 100)
+            //level
+            canvas.textColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawText(message: "Level = " + String(levelCounter), size: 25, x: (canvas.width/2) - 225, y:650)
+            
+            //score
+            canvas.textColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
+            canvas.drawText(message: "Score = " + String(score), size: 25, x: (canvas.width/2) + 95, y: 650)
+            
+        }
     }
     
     // ORSSerialPortDelegate
@@ -109,11 +193,17 @@ class Sketch : NSObject, ORSSerialPortDelegate {
                     
                     // Entire value sent from Arduino board received, assign to
                     // variable that controls the horizontal position of the circle on screen
-                    x = Double(serialBuffer)! //takes the value as a doublefloat
-                    x = x * -500 // multiplies it by -500 to change the sides of the accelerometer and
-                                // to keep it at scale
-                    newX = Int(x) //coverts to integer and assigns it to new variable
-                    print("\(string)", terminator: "")
+                    if let xAsString = serialBuffer as String? { //takes the value as a doublefloat
+                        if (xAsString != "") {
+                            print("\(xAsString)")
+                            x =  Double(xAsString)!
+                            x = (x * -500) + 200// multiplies it by -500 to change the sides of the accelerometer and
+                            // to keep it at scale
+                            newX = Int(x) //coverts to integer and assigns it to new variable
+                            
+                        }
+                    }
+                    // print("\(string)", terminator: "")
                     // Reset the string that is the buffer for data received from serial port
                     serialBuffer = ""
                     
@@ -124,9 +214,9 @@ class Sketch : NSObject, ORSSerialPortDelegate {
                 }
                 
             }
-
+            
             // DEBUG: Print what's coming over the serial port
-            print("\(string)", terminator: "")
+            //print("\(string)", terminator: "")
             
         }
         
