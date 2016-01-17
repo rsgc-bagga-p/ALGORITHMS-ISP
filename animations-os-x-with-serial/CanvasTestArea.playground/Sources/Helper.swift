@@ -430,10 +430,10 @@ public class Canvas : CustomPlaygroundQuickLookable {
             
             // If an error occured, return an empty path
             return NSBezierPath()
+        }
     }
-    }
-
-
+    
+    
     public func customPlaygroundQuickLook() -> PlaygroundQuickLook {
         return .Image(self.imageView)
     }

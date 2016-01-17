@@ -1,10 +1,6 @@
-//
-//  Sketch.swift
-//  Animation
-//
-//  Created by Russell Gordon on 2015-12-05.
-//  Copyright © 2015 Royal St. George's College. All rights reserved.
-//
+//  Algorithms ISP 1
+//  Created by Puneet Singh Bagga December 11th, 2015.
+
 
 import Foundation
 
@@ -28,7 +24,7 @@ class Sketch : NSObject, ORSSerialPortDelegate {
     var serialBuffer : String = ""
     var x = 0.00   // x input from accelerometer
     var y = 0   // Vertical position for the circle appearing on screen
-    var s = 1
+    var s = 3
     var newX = 0 //new x variable, controls the horizontal
     var blockX: [Int] = [0,0,0,0,0,0,0,0,0,0] //obstruction x value
     var blockY: [Int] = [0,0,0,0,0,0,0,0,0,0] //obstruction y value
@@ -144,7 +140,7 @@ class Sketch : NSObject, ORSSerialPortDelegate {
             }
             boolCheck = true //recreates the obstructions
             
-            for p in 1...blockNum{ //for int p in blocknum
+            for p in 0...blockNum-1{ //for int p in blocknum
                 if (y > blockY[p] && y < blockY[p] + 60 && newX > blockX[p] && newX < blockX[p] + 60){ //if the x and y value of the circle are equal to the block position then do this
                     
                     gameOver = true //game over
