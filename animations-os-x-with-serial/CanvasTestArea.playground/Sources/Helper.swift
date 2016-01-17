@@ -383,6 +383,57 @@ public class Canvas : CustomPlaygroundQuickLookable {
         
     }
     
+    public func drawTriangle(bottomRightX bottomRightX: Int, bottomRightY: Int, width: Int, height: Int, borderWidth: Int = 1) -> NSBezierPath{
+        
+        // If an image has been defined for the image view, draw on it
+        if let _ = self.imageView.image?.lockFocus() {
+            
+            // Make the new path
+            let path = NSBezierPath()
+            
+            // Set width of border
+            if borderWidth > 0 {
+                path.lineWidth = CGFloat(borderWidth)
+            } else {
+                path.lineWidth = CGFloat(self.defaultBorderWidth)
+            }
+            
+            // Define the path
+            path.moveToPoint(NSPoint(x: bottomRightX, y: bottomRightY))
+            path.lineToPoint(NSPoint(x: bottomRightX + (width/2), y: bottomRightY + height))
+            path.lineToPoint(NSPoint(x: bottomRightX + width, y: bottomRightY))
+            path.lineToPoint(NSPoint(x: bottomRightX, y: bottomRightY))
+            
+            // Set triangle border color
+            NSColor(hue: borderColor.translatedHue, saturation: borderColor.translatedSaturation, brightness: borderColor.translatedBrightness, alpha: borderColor.translatedAlpha).setStroke()
+            
+            // Draw the triangle border
+            if (self.drawShapesWithBorders == true) {
+                path.stroke()
+            }
+            
+            // Set triangle fill color
+            NSColor(hue: fillColor.translatedHue, saturation: fillColor.translatedSaturation, brightness: fillColor.translatedBrightness, alpha: fillColor.translatedAlpha).setFill()
+            
+            // Fill the triangle
+            if (self.drawShapesWithFill == true) {
+                path.fill()
+            }
+            
+            // Stop drawing to the image
+            self.imageView.image!.unlockFocus()
+            
+            // Show the path created (this improves QuickLook results in Swift Playground)
+            return path
+            
+        } else {
+            
+            // If an error occured, return an empty path
+            return NSBezierPath()
+    }
+    }
+
+
     public func customPlaygroundQuickLook() -> PlaygroundQuickLook {
         return .Image(self.imageView)
     }

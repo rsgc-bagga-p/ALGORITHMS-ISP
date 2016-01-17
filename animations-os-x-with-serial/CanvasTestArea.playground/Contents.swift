@@ -55,6 +55,8 @@ for i in -5...5 {
     canvas.drawLine(fromX: canvas.width / 2, fromY: 50, toX: canvas.width / 2 + i*50, toY: 150, lineWidth: i)
 }
 
+canvas.drawTriangle(bottomRightX: 50, bottomRightY: 50, width: 50, height: 50)
+
 // View the current state of the canvas
 canvas
 

@@ -125,7 +125,8 @@ class Sketch : NSObject, ORSSerialPortDelegate {
             // Draw a circle that moves across the screen
             canvas.drawShapesWithBorders = false
             canvas.fillColor = Color(hue: Float(canvas.frameCount), saturation: 80, brightness: 90, alpha: 100)
-            canvas.drawEllipse(centreX: newX, centreY: y, width: 35, height: 35)
+            canvas.drawEllipse(centreX: newX, centreY: y, width: 15, height: 15) //the circle is tracked
+            canvas.drawTriangle(bottomRightX: newX - 20, bottomRightY: y - 10, width: 40, height: 40) //the triangle is drawn above the circle to put the x and y in the centre
             
             while(boolCheck) { //while this is true
                 //Drawing the obstructions
@@ -194,16 +195,16 @@ class Sketch : NSObject, ORSSerialPortDelegate {
                     // Entire value sent from Arduino board received, assign to
                     // variable that controls the horizontal position of the circle on screen
                     if let xAsString = serialBuffer as String? { //takes the value as a doublefloat
-                        if (xAsString != "") {
-                            print("\(xAsString)")
-                            x =  Double(xAsString)!
+                        if (xAsString != "") { //if there is something coming in the serial port
+                            print("\(xAsString)") //prints value
+                            x =  Double(xAsString)!// converts to double float
                             x = (x * -500) + 200// multiplies it by -500 to change the sides of the accelerometer and
                             // to keep it at scale
                             newX = Int(x) //coverts to integer and assigns it to new variable
                             
                         }
                     }
-                    // print("\(string)", terminator: "")
+                    // print("\(string)", terminator: "") //debugging
                     // Reset the string that is the buffer for data received from serial port
                     serialBuffer = ""
                     
